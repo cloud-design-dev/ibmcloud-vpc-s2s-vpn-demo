@@ -1,0 +1,9 @@
+# Name of an existing resource group. If not specified a new one is created
+existing_resource_group=""
+
+# IBM Cloud VPC region to deploy VPN demo
+ibmcloud_region=""
+
+# IBM Cloud API Key
+ibmcloud_api_key=""
+
