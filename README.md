@@ -9,8 +9,8 @@ Deploy 2 VPCs and connect them with Site to Site gateways using policy based VPN
 The first step is to clone the repository and configure the terraform variables.
 
 ```shell
-git clone https://github.com/cloud-design-dev/ibmcloud-vpc-ts-router.git
-cd ibmcloud-vpc-ts-router
+git clone https://github.com/cloud-design-dev/ibmcloud-vpc-s2s-vpn-demo.git
+cd ibmcloud-vpc-s2s-vpn-demo
 ```
 
 Copy the example terraform variables file and update the values with your own. See [inputs](#inputs) for more information on the required variables.
@@ -32,6 +32,17 @@ If no errors are returned, you can apply the plan to create the VPCs, subnets, a
 
 ```shell
 terraform apply plan.out
+```
+
+When the provosion is complete, you should see the output of the plan, including the VPN gateway IPs.
+
+```shell
+Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+site_2_gateway_ip = "13.116.90.104"
+site_a_gateway_ip = "13.116.90.104"
 ```
 
 ---
