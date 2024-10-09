@@ -19,6 +19,17 @@ Copy the example terraform variables file and update the values with your own. S
 cp tfvars-template terraform.tfvars
 ```
 
+#### Variables 
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_existing_resource_group"></a> [existing\_resource\_group](#input\_existing\_resource\_group) | The IBM Cloud resource group to assign to the provisioned resources. | `string` | n/a | yes |
+| <a name="input_existing_ssh_key"></a> [existing\_ssh\_key](#input\_existing\_ssh\_key) | The name of an existing SSH key to use for provisioning resources. If one is not provided, a new key will be generated. | `string` | `""` | no |
+| <a name="input_ibmcloud_api_key"></a> [ibmcloud\_api\_key](#input\_ibmcloud\_api\_key) | The IBM Cloud API key to use for provisioning resources | `string` | n/a | yes |
+| <a name="input_ibmcloud_region"></a> [ibmcloud\_region](#input\_ibmcloud\_region) | The IBM Cloud region to use for provisioning VPCs and other resources. | `string` | n/a | yes |
+| <a name="input_project_prefix"></a> [project\_prefix](#input\_project\_prefix) | The prefix to use for naming resources. If none is provided, a random string will be generated. | `string` | `""` | no |
+
+
 ### Initialize, Plan and Apply the Terraform configuration
 
 Once you have the required variables set, you can initialize the terraform configuration and create a plan for the deployment.
@@ -37,7 +48,7 @@ terraform apply plan.out
 When the provosion is complete, you should see the output of the plan, including the VPN gateway IPs.
 
 ```shell
-Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
+Apply complete! Resources: 33 added, 0 changed, 0 destroyed.
 
 Outputs:
 
