@@ -41,60 +41,46 @@ Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
 
 Outputs:
 
-site_2_gateway_ip = "13.116.90.104"
-site_a_gateway_ip = "13.116.90.104"
+Site_A_Information = [
+  "VPN Gateway IP: 169.63.99.32",
+  "Compute Private IP: 172.16.0.20",
+  "Compute Public IP: 150.239.113.167",
+  "VPC URL: https://cloud.ibm.com/infrastructure/network/vpc/us-east~r014-78c1dc0f-f20e-43af-a8a4-0909a8a5d7a7/overview",
+  "VPN URL: https://cloud.ibm.com/infrastructure/network/vpngateway/us-east~0757-55e495cb-aee1-4a86-ba31-700386b065a9/overview",
+]
+Site_B_Information = [
+  "VPN Gateway IP: 52.116.123.171",
+  "Compute Private IP: 192.168.0.20",
+  "Compute Public IP: 52.116.120.122",
+  "VPC URL: https://cloud.ibm.com/infrastructure/network/vpc/us-east~r014-e629ce5e-4c32-42ea-b0e8-806887969e38/overview",
+  "VPN URL: https://cloud.ibm.com/infrastructure/network/vpngateway/us-east~0757-bdee8a6c-fada-4a86-824e-9c94e7fbc9f3/overview",
+]
 ```
 
----
+### Test Connnectivity
 
-<!-- BEGIN_TF_DOCS -->
-## Requirements
+We can quickly test the connection by pinging from site a compute to site b compute and vice versa. 
 
-| Name | Version |
-|------|---------|
-| <a name="requirement_ibm"></a> [ibm](#requirement\_ibm) | 1.69.2 |
+```shell
+ssh -t root@150.239.113.167 'ping -c3 192.168.0.20'
+PING 192.168.0.20 (192.168.0.20) 56(84) bytes of data.
+64 bytes from 192.168.0.20: icmp_seq=1 ttl=62 time=1.51 ms
+64 bytes from 192.168.0.20: icmp_seq=2 ttl=62 time=1.78 ms
+64 bytes from 192.168.0.20: icmp_seq=3 ttl=62 time=1.58 ms
 
-## Providers
+--- 192.168.0.20 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2004ms
+rtt min/avg/max/mdev = 1.508/1.623/1.779/0.114 ms
+Connection to 150.239.113.167 closed.
 
-| Name | Version |
-|------|---------|
-| <a name="provider_ibm"></a> [ibm](#provider\_ibm) | 1.69.2 |
-| <a name="provider_random"></a> [random](#provider\_random) | 3.6.3 |
+ssh -t root@52.116.120.122 'ping -c3 172.16.0.20'
+PING 172.16.0.20 (172.16.0.20) 56(84) bytes of data.
+64 bytes from 172.16.0.20: icmp_seq=1 ttl=62 time=1.78 ms
+64 bytes from 172.16.0.20: icmp_seq=2 ttl=62 time=1.75 ms
+64 bytes from 172.16.0.20: icmp_seq=3 ttl=62 time=1.73 ms
 
-## Modules
-
-| Name | Source | Version |
-|------|--------|---------|
-| <a name="module_add_rules_to_default_vpc_security_group"></a> [add\_rules\_to\_default\_vpc\_security\_group](#module\_add\_rules\_to\_default\_vpc\_security\_group) | terraform-ibm-modules/security-group/ibm | n/a |
-| <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | terraform-ibm-modules/resource-group/ibm | 1.1.5 |
-| <a name="module_site_a_vpc"></a> [site\_a\_vpc](#module\_site\_a\_vpc) | ./modules/vpc | n/a |
-| <a name="module_site_b_vpc"></a> [site\_b\_vpc](#module\_site\_b\_vpc) | ./modules/vpc | n/a |
-
-## Resources
-
-| Name | Type |
-|------|------|
-| [ibm_is_vpn_gateway.site_a_s2s](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.69.2/docs/resources/is_vpn_gateway) | resource |
-| [ibm_is_vpn_gateway.site_b_s2s](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.69.2/docs/resources/is_vpn_gateway) | resource |
-| [ibm_is_vpn_gateway_connection.site_a_connection](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.69.2/docs/resources/is_vpn_gateway_connection) | resource |
-| [ibm_is_vpn_gateway_connection.site_b_connection](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.69.2/docs/resources/is_vpn_gateway_connection) | resource |
-| [random_string.prefix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
-| [random_string.vpn_preshared_key](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
-| [ibm_is_zones.regional](https://registry.terraform.io/providers/IBM-Cloud/ibm/1.69.2/docs/data-sources/is_zones) | data source |
-
-## Inputs
-
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| <a name="input_existing_resource_group"></a> [existing\_resource\_group](#input\_existing\_resource\_group) | The IBM Cloud resource group to assign to the provisioned resources. | `string` | n/a | yes |
-| <a name="input_ibmcloud_api_key"></a> [ibmcloud\_api\_key](#input\_ibmcloud\_api\_key) | The IBM Cloud API key to use for provisioning resources | `string` | n/a | yes |
-| <a name="input_ibmcloud_region"></a> [ibmcloud\_region](#input\_ibmcloud\_region) | The IBM Cloud region to use for provisioning VPCs and other resources. | `string` | n/a | yes |
-| <a name="input_project_prefix"></a> [project\_prefix](#input\_project\_prefix) | The prefix to use for naming resources. If none is provided, a random string will be generated. | `string` | `""` | no |
-
-## Outputs
-
-| Name | Description |
-|------|-------------|
-| <a name="output_vpn_gateway_ip"></a> [vpn\_gateway\_ip](#output\_vpn\_gateway\_ip) | n/a |
-| <a name="output_vpn_info"></a> [vpn\_info](#output\_vpn\_info) | n/a |
-<!-- END_TF_DOCS -->
+--- 172.16.0.20 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2004ms
+rtt min/avg/max/mdev = 1.726/1.751/1.780/0.022 ms
+Connection to 52.116.120.122 closed.
+```
