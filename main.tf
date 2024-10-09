@@ -178,3 +178,17 @@ module "site_b_compute" {
   instance_security_group = module.site_b_vpc.default_security_group
   ssh_key_ids             = [data.ibm_is_ssh_key.sshkey.id]
 }
+
+resource "ibm_is_floating_ip" "site_a" {
+  name           = "${local.prefix}-a-fip"
+  target         = module.site_a_compute.vnic_id
+  resource_group = module.resource_group.resource_group_id
+  tags           = concat(local.tags, ["site_a"])
+}
+
+resource "ibm_is_floating_ip" "site_b" {
+  name           = "${local.prefix}-b-fip"
+  target         = module.site_b_compute.vnic_id
+  resource_group = module.resource_group.resource_group_id
+  tags           = concat(local.tags, ["site_b"])
+}
