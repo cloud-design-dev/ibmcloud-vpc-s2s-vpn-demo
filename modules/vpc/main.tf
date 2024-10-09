@@ -39,12 +39,23 @@ resource "ibm_is_public_gateway" "gateway" {
 }
 
 # Subnet
-resource "ibm_is_subnet" "subnet" {
-  name                     = "${var.name}-${local.vpc_zones[0].zone}-subnet"
+resource "ibm_is_subnet" "vpn_subnet" {
+  depends_on               = [ibm_is_vpc_address_prefix.prefix]
+  name                     = "${var.name}-${local.vpc_zones[0].zone}-vpn-subnet"
   resource_group           = var.resource_group_id
   vpc                      = ibm_is_vpc.vpc.id
   zone                     = local.vpc_zones[0].zone
-  total_ipv4_address_count = "64"
+  total_ipv4_address_count = "16"
+  tags                     = concat(var.tags, ["zone:${local.vpc_zones[0].zone}"])
+}
+
+resource "ibm_is_subnet" "compute_subnet" {
+  depends_on               = [ibm_is_vpc_address_prefix.prefix]
+  name                     = "${var.name}-${local.vpc_zones[0].zone}-compute-subnet"
+  resource_group           = var.resource_group_id
+  vpc                      = ibm_is_vpc.vpc.id
+  zone                     = local.vpc_zones[0].zone
+  total_ipv4_address_count = "16"
   public_gateway           = ibm_is_public_gateway.gateway.id
   tags                     = concat(var.tags, ["zone:${local.vpc_zones[0].zone}"])
 }

@@ -10,12 +10,20 @@ output "default_security_group" {
   value = ibm_is_vpc.vpc.default_security_group
 }
 
-output "vpc_subnet_id" {
-  value = ibm_is_subnet.subnet.id
+output "vpn_subnet_id" {
+  value = ibm_is_subnet.vpn_subnet.id
 }
 
-output "vpc_subnet_cidr" {
-  value = ibm_is_subnet.subnet.ipv4_cidr_block
+output "vpn_subnet_cidr" {
+  value = ibm_is_subnet.vpn_subnet.ipv4_cidr_block
+}
+
+output "compute_subnet_id" {
+  value = ibm_is_subnet.compute_subnet.id
+}
+
+output "compute_subnet_cidr" {
+  value = ibm_is_subnet.compute_subnet.ipv4_cidr_block
 }
 
 output "vpc_crn" {

@@ -20,8 +20,8 @@ variable "existing_resource_group" {
   type        = string
 }
 
-# variable "existing_ssh_key" {
-#   description = "The name of an existing SSH key to use for provisioning resources. If one is not provided, a new key will be generated."
-#   type        = string
-#   default     = ""
-# }
+variable "existing_ssh_key" {
+  description = "The name of an existing SSH key to use for provisioning resources. If one is not provided, a new key will be generated."
+  type        = string
+  default     = ""
+}
