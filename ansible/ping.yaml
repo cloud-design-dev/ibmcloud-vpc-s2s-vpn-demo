@@ -1,0 +1,26 @@
+---
+- name: Ping across tunnel from both sides
+  hosts: all
+  vars_files:
+    - playbook_vars.yaml
+  tasks:
+    - name: Ping from Site A to Site B
+      ansible.builtin.command:
+        cmd: ping -c 3 "{{ site_b_private_ip }}"
+      register: a_to_b_ping_result
+      when: inventory_hostname in groups['site_a']
+      changed_when: a_to_b_ping_result.rc != 0
+    - name: Display ping result from Site A to Site B
+      ansible.builtin.debug:
+        var: a_to_b_ping_result.stdout_lines
+      when: inventory_hostname in groups['site_a']
+    - name: Ping from Site B to Site A
+      ansible.builtin.command:
+        cmd: ping -c 3 "{{ site_a_private_ip }}"
+      register: b_to_a_ping_result
+      when: inventory_hostname in groups['site_b']
+      changed_when: b_to_a_ping_result.rc != 0
+    - name: Display ping result from Site B to Site A
+      ansible.builtin.debug:
+        var: b_to_a_ping_result.stdout_lines
+      when: inventory_hostname in groups['site_b']

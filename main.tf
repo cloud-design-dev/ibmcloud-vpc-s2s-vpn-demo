@@ -82,7 +82,7 @@ module "update_site_a_security_group" {
       remote = "0.0.0.0/0"
     }
   ]
-  tags = local.tags
+  tags = concat(local.tags, ["site_a"])
 }
 
 module "update_site_b_security_group" {
@@ -110,23 +110,23 @@ module "update_site_b_security_group" {
       remote = "0.0.0.0/0"
     }
   ]
-  tags = local.tags
+  tags = concat(local.tags, ["site_b"])
 }
 
 resource "ibm_is_vpn_gateway" "site_a_s2s" {
   name           = "${local.prefix}-site-a-vpn"
-  subnet         = module.site_a_vpc.vpn_subnet_id
+  subnet         = module.site_a_vpc.subnet_ids[0]
   mode           = "policy"
   resource_group = module.resource_group.resource_group_id
-  tags           = local.tags
+  tags           = concat(local.tags, ["site_a"])
 }
 
 resource "ibm_is_vpn_gateway" "site_b_s2s" {
   name           = "${local.prefix}-site-b-vpn"
-  subnet         = module.site_b_vpc.vpn_subnet_id
+  subnet         = module.site_b_vpc.subnet_ids[0]
   mode           = "policy"
   resource_group = module.resource_group.resource_group_id
-  tags           = local.tags
+  tags           = concat(local.tags, ["site_b"])
 }
 
 resource "ibm_is_vpn_gateway_connection" "site_a_connection" {
@@ -135,10 +135,10 @@ resource "ibm_is_vpn_gateway_connection" "site_a_connection" {
   preshared_key = random_string.vpn_preshared_key.result
   peer {
     address = ibm_is_vpn_gateway.site_b_s2s.public_ip_address
-    cidrs   = [module.site_b_vpc.compute_subnet_cidr]
+    cidrs   = [module.site_b_vpc.subnet_cidrs[0]]
   }
   local {
-    cidrs = [module.site_a_vpc.compute_subnet_cidr]
+    cidrs = [module.site_a_vpc.subnet_cidrs[0]]
   }
 }
 
@@ -148,10 +148,10 @@ resource "ibm_is_vpn_gateway_connection" "site_b_connection" {
   preshared_key = random_string.vpn_preshared_key.result
   peer {
     address = ibm_is_vpn_gateway.site_a_s2s.public_ip_address
-    cidrs   = [module.site_a_vpc.compute_subnet_cidr]
+    cidrs   = [module.site_a_vpc.subnet_cidrs[0]]
   }
   local {
-    cidrs = [module.site_b_vpc.compute_subnet_cidr]
+    cidrs = [module.site_b_vpc.subnet_cidrs[0]]
   }
 }
 
@@ -160,7 +160,7 @@ module "site_a_compute" {
   name                    = "${local.prefix}-a-instance"
   zone                    = local.vpc_zones[0].zone
   vpc_id                  = module.site_a_vpc.vpc_id
-  subnet_id               = module.site_a_vpc.compute_subnet_id
+  subnet_id               = module.site_a_vpc.subnet_ids[0]
   resource_group_id       = module.resource_group.resource_group_id
   tags                    = concat(local.tags, ["site_a"])
   instance_security_group = module.site_a_vpc.default_security_group
@@ -172,7 +172,7 @@ module "site_b_compute" {
   name                    = "${local.prefix}-b-instance"
   zone                    = local.vpc_zones[0].zone
   vpc_id                  = module.site_b_vpc.vpc_id
-  subnet_id               = module.site_b_vpc.compute_subnet_id
+  subnet_id               = module.site_b_vpc.subnet_ids[0]
   resource_group_id       = module.resource_group.resource_group_id
   tags                    = concat(local.tags, ["site_b"])
   instance_security_group = module.site_b_vpc.default_security_group
@@ -192,3 +192,42 @@ resource "ibm_is_floating_ip" "site_b" {
   resource_group = module.resource_group.resource_group_id
   tags           = concat(local.tags, ["site_b"])
 }
+
+module "ansible" {
+  source            = "./ansible"
+  site_a_public_ip  = ibm_is_floating_ip.site_a.address
+  site_a_private_ip = module.site_a_compute.compute_instance_ip
+  site_b_public_ip  = ibm_is_floating_ip.site_b.address
+  site_b_private_ip = module.site_b_compute.compute_instance_ip
+}
+
+# resource "ansible_host" "site_a_instance" {
+#   name   = "${local.prefix}-a-instance"
+#   groups = ["site_a"] # Groups this host is part of.
+#   variables = {
+#     ansible_user = "root"
+#     ansible_host = ibm_is_floating_ip.site_a.address
+#     hostname     = "${local.prefix}-a-instance"
+#   }
+# }
+
+# resource "ansible_host" "site_b_instance" {
+#   name   = "${local.prefix}-b-instance"
+#   groups = ["site_b"] # Groups this host is part of.
+#   variables = {
+#     ansible_user = "root"
+#     ansible_host = ibm_is_floating_ip.site_b.address
+#     hostname     = "${local.prefix}-b-instance"
+#   }
+# }
+
+# resource "ansible_playbook" "ping_a_to_b" {
+#   playbook   = "ping.yaml"
+#   name   = "${local.prefix}-a-instance"
+#   replayable = true
+#   groups    = ["site_a"]
+
+#   extra_vars = {
+#     target_host = module.site_b_compute.compute_instance_ip
+#   }
+# }
