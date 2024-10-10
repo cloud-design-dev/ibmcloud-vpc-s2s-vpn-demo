@@ -52,20 +52,16 @@ Apply complete! Resources: 33 added, 0 changed, 0 destroyed.
 
 Outputs:
 
-Site_A_Information = [
-  "VPN Gateway IP: 169.63.99.32",
-  "Compute Private IP: 172.16.0.20",
-  "Compute Public IP: 150.239.113.167",
-  "VPC URL: https://cloud.ibm.com/infrastructure/network/vpc/us-east~r014-78c1dc0f-f20e-43af-a8a4-0909a8a5d7a7/overview",
-  "VPN URL: https://cloud.ibm.com/infrastructure/network/vpngateway/us-east~0757-55e495cb-aee1-4a86-ba31-700386b065a9/overview",
-]
-Site_B_Information = [
-  "VPN Gateway IP: 52.116.123.171",
-  "Compute Private IP: 192.168.0.20",
-  "Compute Public IP: 52.116.120.122",
-  "VPC URL: https://cloud.ibm.com/infrastructure/network/vpc/us-east~r014-e629ce5e-4c32-42ea-b0e8-806887969e38/overview",
-  "VPN URL: https://cloud.ibm.com/infrastructure/network/vpngateway/us-east~0757-bdee8a6c-fada-4a86-824e-9c94e7fbc9f3/overview",
-]
+site_a_info = {
+  "compute_private_ip" = "172.16.0.4"
+  "compute_public_ip" = "163.66.94.108"
+  "vpn_gateway_ip" = "163.66.94.111"
+}
+site_b_info = {
+  "compute_private_ip" = "192.168.0.4"
+  "compute_public_ip" = "163.66.94.106"
+  "vpn_gateway_ip" = "163.66.94.107"
+}
 ```
 
 ### Test Connnectivity
