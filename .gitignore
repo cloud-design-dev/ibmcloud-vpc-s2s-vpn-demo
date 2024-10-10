@@ -38,3 +38,4 @@ override.tf.json
 terraform.rc
 ansible/inventory.ini
 ansible_collections/*
+ansible/playbook_vars.yaml

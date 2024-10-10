@@ -70,28 +70,23 @@ Site_B_Information = [
 
 ### Test Connnectivity
 
-We can quickly test the connection by pinging from site a compute to site b compute and vice versa. 
+You can test the connectivity between the two VPCs by SSHing into the compute instances and pinging across the VPN tunnel.
 
 ```shell
-ssh -t root@150.239.113.167 'ping -c3 192.168.0.20'
-PING 192.168.0.20 (192.168.0.20) 56(84) bytes of data.
-64 bytes from 192.168.0.20: icmp_seq=1 ttl=62 time=1.51 ms
-64 bytes from 192.168.0.20: icmp_seq=2 ttl=62 time=1.78 ms
-64 bytes from 192.168.0.20: icmp_seq=3 ttl=62 time=1.58 ms
+site_a_private_ip=$(terraform output -json site_a_info | jq -r '.compute_private_ip')
+site_b_private_ip=$(terraform output -json site_b_info | jq -r '.compute_private_ip')
+site_a_public_ip=$(terraform output -json site_a_info | jq -r '.compute_public_ip')
+site_b_public_ip=$(terraform output -json site_b_info | jq -r '.compute_public_ip')
 
---- 192.168.0.20 ping statistics ---
-3 packets transmitted, 3 received, 0% packet loss, time 2004ms
-rtt min/avg/max/mdev = 1.508/1.623/1.779/0.114 ms
-Connection to 150.239.113.167 closed.
 
-ssh -t root@52.116.120.122 'ping -c3 172.16.0.20'
-PING 172.16.0.20 (172.16.0.20) 56(84) bytes of data.
-64 bytes from 172.16.0.20: icmp_seq=1 ttl=62 time=1.78 ms
-64 bytes from 172.16.0.20: icmp_seq=2 ttl=62 time=1.75 ms
-64 bytes from 172.16.0.20: icmp_seq=3 ttl=62 time=1.73 ms
-
---- 172.16.0.20 ping statistics ---
-3 packets transmitted, 3 received, 0% packet loss, time 2004ms
-rtt min/avg/max/mdev = 1.726/1.751/1.780/0.022 ms
-Connection to 52.116.120.122 closed.
+ssh -t "root@${site_a_public_ip}" "ping -c3 ${site_b_private_ip}"
+ssh -t "root@${site_b_public_ip}" "ping -c3 ${site_a_private_ip}"
 ```
+
+The code also includes an ansible playbook you can use to ping across the VPN tunnel. 
+
+```shell
+ansible-playbook -i ansible/inventory.ini ansible/ping.yaml
+```
+
+![Ansible playbook output](https://images.gh40-dev.systems/Shared-Image-2024-10-10-12-43-01.png)
